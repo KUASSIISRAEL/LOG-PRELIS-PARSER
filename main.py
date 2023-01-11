@@ -1,7 +1,7 @@
 import copy
+import os
 import pathlib
 import re
-import os
 import sys
 from datetime import *
 from typing import Dict, List, Tuple
@@ -74,12 +74,13 @@ class LogFactory:
     def readFile(self, filename: str) -> str:
         parent = pathlib.Path(__file__).parent
         filepath = parent / f'{LOG_PATH_DIR}/{filename}'
-        output_file = os.path.join(parent, 'outputs/access_logs.parquet')
-        log_format = os.path.join(parent, 'outputs/log_errors.csv')
+        datetime_code = datetime.now().strftime(format="%Y%m%d_%H_%m_%s")
+        output_file = os.path.join(parent, f'outputs/access_logs_{datetime_code}.parquet')
+        errors_file = os.path.join(parent, f'outputs/log_errors_{datetime_code}.csv')
         adv.logs_to_df(
             log_file=filepath,
-            output_file=os.path.join(parent, 'outputs/access_logs.parquet'),
-            errors_file=os.path.join(parent, 'outputs/log_errors.csv'),
+            output_file=output_file,
+            errors_file=errors_file,
             log_format='common',
             fields=None
         )

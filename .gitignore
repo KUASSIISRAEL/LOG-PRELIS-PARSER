@@ -2,6 +2,7 @@
 __pycache__/
 .vscode/
 assets/
+outputs/
 .env
 .env.example
 .DS_Store
