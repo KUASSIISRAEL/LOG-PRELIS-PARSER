@@ -1,0 +1,8 @@
+.env/
+__pycache__/
+.vscode/
+assets/
+.env
+.env.example
+.DS_Store
+.idea/
