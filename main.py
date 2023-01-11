@@ -74,6 +74,8 @@ class LogFactory:
     def readFile(self, filename: str) -> str:
         parent = pathlib.Path(__file__).parent
         filepath = parent / f'{LOG_PATH_DIR}/{filename}'
+        output_file = os.path.join(parent, 'outputs/access_logs.parquet')
+        log_format = os.path.join(parent, 'outputs/log_errors.csv')
         adv.logs_to_df(
             log_file=filepath,
             output_file=os.path.join(parent, 'outputs/access_logs.parquet'),
@@ -81,7 +83,11 @@ class LogFactory:
             log_format='common',
             fields=None
         )
-        logs_df = pd.read_parquet('access_logs.parquet')
+        logs_df = pd.read_parquet(
+            filename=output_file,
+            encoding='ISO-8859-1',
+            low_memory=False
+        )
 
 
 def main():
