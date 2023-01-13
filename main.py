@@ -1,8 +1,10 @@
 import copy
+import csv
+import io
 import os
 import pathlib
 import re
-import sys
+import json
 from datetime import *
 from typing import Dict, List, Tuple
 
@@ -14,91 +16,183 @@ from dateutil.parser import *
 from dateutil.relativedelta import *
 from dateutil.rrule import *
 
-from constants import LOG_PATH_DIR, PRELIS_PATH_DIR
+from constants import (ANNULATION_REGEX, ANNULATIONS_REGEX, LOG_PATH_DIR,
+                       PAN_REGEX, PRELIS_PATH_DIR, RESPONSE_200,
+                       VIREMENT_REGEX, VIREMENTS_REGEX)
 
 
 class PrelisFactory:
-    def readFile(self, filename: str) -> List[Tuple]:
+    def __init__(self, filename: str):
+        self._filename = filename
+        self._lines = None
+        self._recipe = None
+
+    @property
+    def filename(self):
+        return self._filename
+
+    @filename.setter
+    def filename(self, new_filename: str):
+        self._filename = new_filename
+
+    @property
+    def recipe(self):
+        return self._recipe
+
+    @recipe.setter
+    def recipe(self, new_recipe: List):
+        self._recipe = new_recipe
+
+    @property
+    def lines(self):
+        return self._lines
+
+    @lines.setter
+    def lines(self, new_lines: List):
+        self._lines = new_lines
+
+    def readFile(self) -> List[Tuple]:
         filepath = pathlib.Path(__file__).parent
-        filepath = filepath / f'{PRELIS_PATH_DIR}/{filename}'
+        filepath = filepath / f'{PRELIS_PATH_DIR}/{self.filename}'
         with open(filepath) as file:
-            lines = file.readlines()
-            for index, line in enumerate(lines):
+            self.lines = file.readlines()
+            for index, line in enumerate(self.lines):
                 line = line.replace('\n', '')
                 line = line.replace('  ', '')
-                lines[index] = tuple(line.split(' '))
+                self.lines[index] = tuple(line.split(' '))
             file.close()
-        return lines
+        return self.lines
 
-    def extractDate(self, datas: list) -> List[Dict]:
-        recipient = copy.deepcopy(datas)
-        for index, (pan, toChange) in enumerate(recipient):
+    def extractDate(self) -> List[Dict]:
+        self.recipe = {}
+        for index, (pan, toChange) in enumerate(self.lines):
             date = pan[2:12]
-            recipient[index] = {
+            self.recipe[str(pan[-4:])] = {
                 'ID': index,
                 'pan': pan,
-                'toChange': toChange,
-                'fourLastNumbers': pan[-4:],
-                'dateObject': {
-                    'litteral': date,
-                    'days': date[0:2],
-                    'months': date[2:4],
-                    'years': date[4:6],
-                    'hours': date[6:8],
-                    'minutes': date[8:10],
-                },
             }
-            date = recipient[index].get('dateObject')
-            recipient[index].update({
-                'datetime': datetime(
-                    int(f"20{date.get('years')}"),
-                    int(date.get('months')),
-                    int(date.get('days')),
-                    int(date.get('hours')),
-                    int(date.get('minutes')),
-                )
+            self.recipe[str(pan[-4:])].update({
+                'datetime': str(datetime(
+                    int(f"20{date[4:6]}"),
+                    int(date[2:4]),
+                    int(date[0:2]),
+                    int(date[6:8]),
+                    int(date[8:10]),
+                ))
             })
-            recipient[index].update({
-                'isoDatetime': datetime(
-                    int(f"20{date.get('years')}"),
-                    int(date.get('months')),
-                    int(date.get('days')),
-                    int(date.get('hours')),
-                    int(date.get('minutes')),
-                ).isocalendar()
-            })
-        return recipient
+        return self.recipe
+
+    def treat(self):
+        datas = self.readFile()
+        datas = self.extractDate()
+        return datas
 
 
 class LogFactory:
-    def readFile(self, filename: str) -> str:
+    def __init__(self, filename: str):
+        self._filename = filename
+        self._lines = []
+        self._recipe = None
+
+    @property
+    def filename(self):
+        return self._filename
+
+    @filename.setter
+    def filename(self, new_filename: str):
+        self._filename = new_filename
+
+    @property
+    def recipe(self):
+        return self._recipe
+
+    @recipe.setter
+    def recipe(self, new_recipe: List):
+        self._recipe = new_recipe
+
+    @property
+    def lines(self):
+        return self._lines
+
+    @lines.setter
+    def lines(self, new_lines: List):
+        self._lines = new_lines
+
+    def readFile(self) -> List[str]:
         parent = pathlib.Path(__file__).parent
-        filepath = parent / f'{LOG_PATH_DIR}/{filename}'
-        datetime_code = datetime.now().strftime(format="%Y%m%d_%H_%m_%s")
-        output_file = os.path.join(parent, f'outputs/access_logs_{datetime_code}.parquet')
-        errors_file = os.path.join(parent, f'outputs/log_errors_{datetime_code}.csv')
-        adv.logs_to_df(
-            log_file=filepath,
-            output_file=output_file,
-            errors_file=errors_file,
-            log_format='common',
-            fields=None
-        )
-        logs_df = pd.read_parquet(
-            filename=output_file,
-            encoding='ISO-8859-1',
-            low_memory=False
-        )
+        filepath = parent / f'{LOG_PATH_DIR}/{self.filename}'
+        with open(filepath, encoding="Latin-1") as file:
+            string = file.read()
+            pattern = re.compile(r'\s+'.join(ANNULATIONS_REGEX))
+            rollbacks = re.findall(pattern, string)
+            pattern = re.compile(r'\s+'.join(VIREMENTS_REGEX))
+            transfers = re.findall(pattern, string)
+            self.lines = rollbacks + transfers
+            file.close()
+        return self.lines
+
+    def build(self) -> List[dict]:
+        datetime, response, pan = None, None, None
+        for index, line in enumerate(self.lines):
+            spliter = line.split('\n')
+            for item in spliter:
+                pattern = re.compile(PAN_REGEX)
+                matcher = pattern.findall(item)
+                if len(matcher) > 0:
+                    pan = matcher[0]
+                    pan = pan.replace('pan =', '')
+                    pan = pan.strip()
+
+                pattern = re.compile(ANNULATION_REGEX)
+                matcher = pattern.findall(item)
+                if len(matcher) > 0:
+                    response = matcher[0]
+                    response = json.loads(response)
+
+                pattern = re.compile(VIREMENT_REGEX)
+                matcher = pattern.findall(item)
+                if len(matcher) > 0:
+                    response = matcher[0]
+                    response = json.loads(response)
+
+                pattern = re.compile(RESPONSE_200)
+                matcher = pattern.findall(item)
+                if len(matcher) > 0:
+                    replaces = "INFO Response code 200"
+                    str_date = matcher[0].replace(replaces, '')
+                    datetime = parse(str_date)
+
+            self.lines[index] = (
+                pan,
+                pan[-4:],
+                str_date,
+                response
+            )
+        return self.lines
+
+    def treat(self):
+        datas = self.readFile()
+        datas = self.build()
+        return datas
 
 
 def main():
-    instance = PrelisFactory()
-    datas = instance.readFile('PRELIS_21252')
-    recipient = instance.extractDate(datas)
-    print(recipient)
+    datas = []
+    prelis = PrelisFactory('PRELIS_21252')
+    prelis = prelis.treat()
+    logs = LogFactory('midemv-2021-09-08.log')
+    logs = logs.treat()
+    for item in logs:
+        datas.append({
+            'logs': {
+                'pan': item[0],
+                'transNumber': item[3].get('transactionNumber'),
+                'datetime': item[2]
+            },
+            'prelis': prelis.get(item[1])
+        })
+    print(json.dumps(datas))
 
 
 if __name__ == '__main__':
-    instance = LogFactory()
-    datas = instance.readFile('midemv-2021-09-08.log')
-    print(datas)
+    main()
