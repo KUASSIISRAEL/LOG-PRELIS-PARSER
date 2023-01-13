@@ -1,0 +1,148 @@
+https://jsonformatter.org/
+
+PAN: 608967*******9918
+{
+  "transactionNumber": "212515602559",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 50000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -50500,
+  "operationDate": "2021-09-08 07:06:45",
+  "prelisIdentifier": "010809210708081000210000000500001251079237326089670004099918"
+}
+
+###
+
+PAN: 608967*******1514
+{
+  "transactionNumber": "212516539229",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 50000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -6000,
+  "operationDate": "2021-09-08 11:08:04",
+  "prelisIdentifier": "010809211102482000450000000500001251100112526089670004041514"
+}
+
+###
+
+PAN: 608967*******7478
+{
+  "transactionNumber": "212515790897",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 300000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -108500,
+  "operationDate": "2021-09-08 12:03:22",
+  "prelisIdentifier": "010809211205100010540000003000001251124301526089670007027478"
+}
+
+###
+
+PAN: 608967*******3153
+{
+  "transactionNumber": "212519216147",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 200000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -803500,
+  "operationDate": "2021-09-08 16:27:31",
+  "prelisIdentifer": "010809211631Y61409110000003000001251169428246089670006383153"
+}
+
+###
+
+PAN: 608967*******9888
+{
+  "transactionNumber": "212517247479",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 25000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -6400,
+  "operationDate": "2021-09-08 17:30:11",
+  "prelisIdentifier": "010809211731100010130000000250001251177968826089670006119888"
+}
+
+###
+
+PAN: 608967*******0289
+{
+  "transactionNumber": "212516711042",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 115000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -4500,
+  "operationDate": "2021-09-08 19:58:20",
+  "prelisIdentifer": "010809211959100020150000001150001251197521456089670006490289"
+}
+
+###
+
+PAN: 608967*******8129
+{
+  "transactionNumber": "212515451152",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 50000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -35900,
+  "operationDate": "2021-09-08 07:09:09",
+  "prelisIdentifier": "010809210712543000140000000300001251076359796089670006128129"
+}
+
+###
+
+PAN: 608967*******1679
+{
+  "transactionNumber": "212518834342",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 30000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -5000,
+  "operationDate": "2021-09-08 11:37:07",
+  "prelisIdentifier": "010809211138Y61442110000000300001251113046666089670006371679"
+}
+
+###
+
+PAN: 608967*******5381
+
+{
+  "transactionNumber": "212516264591",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 200000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -1699500,
+  "operationDate": "2021-09-08 14:02:50",
+  "prelisIdentifier": "010809211407Y61440110000002000001251142538866089670007025381"
+}
+
+{
+  "transactionNumber": "212516427811",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 200000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -1499000,
+  "operationDate": "2021-09-08 14:06:26",
+  "prelisIdentifier": "010809211407Y61440110000002000001251142538866089670007025381"
+}
+
+{
+  "transactionNumber": "212517342818",
+  "transactionType": "VIREMENT",
+  "transactionAmount": 100000,
+  "recipientFees": 0,
+  "customerFees": 500,
+  "customerBalance": -1398500,
+  "operationDate": "2021-09-08 14:07:30",
+  "prelisIdentifier": "010809211407Y61440110000002000001251142538866089670007025381"
+}
